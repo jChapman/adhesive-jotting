@@ -30,7 +30,12 @@ io.on('connection', (socket) => {
      jots = jots.filter(jot => jot.id === jotData.id)
      io.emit('delete jot', jotData);
    });
-
+   socket.on("delete all", () => {
+     for (let jot of jots) {
+       io.emit("delete jot", { id: jot.id });
+     }
+     jots = [];
+   });
 });
 
 const port = 8000;

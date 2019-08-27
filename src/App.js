@@ -123,6 +123,7 @@ class App extends Component {
     super(props);
     this.handleCreateJot = this.handleCreateJot.bind(this);
     this.handleUpdatePosition = this.handleUpdatePosition.bind(this);
+    this.handleDeleteAll = this.handleDeleteAll.bind(this);
     this.state = {
       jots: props.jots,
       socket: openSocket("http://localhost:8000")
@@ -159,10 +160,15 @@ class App extends Component {
     this.state.socket.emit('jot moved', {id: parseInt(draggableElement.id), position: {x, y}});
   }
 
+  handleDeleteAll() {
+    this.state.socket.emit('delete all');
+  }
+
   render() {
     return (
       <div className="App">
         <JotMaker handleCreateJot={this.handleCreateJot}/>
+        <button onClick={this.handleDeleteAll}>Delete All</button>
         <JotContainer jots={this.state.jots} positionUpdate={this.handleUpdatePosition} socket={this.state.socket}/>
       </div>
     );
