@@ -5,17 +5,19 @@
   "dependencies": {
     "express": "^4.17.1",
     "react": "^16.9.0",
+    "react-color": "^2.17.3",
     "react-dom": "^16.9.0",
     "react-draggable": "^3.3.2",
     "react-scripts": "3.1.1",
-    "socket-io": "^1.0.0",
+    "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "run-server": "node server.js"
   },
   "eslintConfig": {
     "extends": "react-app"

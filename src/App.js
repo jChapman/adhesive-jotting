@@ -3,8 +3,6 @@ import Draggable from 'react-draggable';
 import './App.css';
 import openSocket from 'socket.io-client'
 
-const  socket = openSocket('http://localhost:8000');
-
 class JotMaker extends Component {
   constructor(props) {
     super(props);
@@ -13,8 +11,9 @@ class JotMaker extends Component {
 
   onFormSubmit(e) {
     e.preventDefault();
-    const jotText = e.target.elements.jotText.value.trim();
-    this.props.handleCreateJot(jotText);
+    const text = e.target.elements.jotText.value.trim();
+    const color = e.target.elements.jotText.value.trim();
+    this.props.handleCreateJot({text, color});
   }
 
   render() {
@@ -40,8 +39,8 @@ const Jot = props => (
 
 const JotContainer = props => (
   <div className="jot-container">
-    {props.jots.map((jot) => (
-      <Jot key={jot} text={jot}/>
+    {props.jots.map((jotData) => (
+      <Jot key={jotData.key} text={jotData.text}/>
     ))}
   </div>
 )
@@ -52,14 +51,20 @@ class App extends Component {
     super(props);
     this.handleCreateJot = this.handleCreateJot.bind(this);
     this.state = {
-      jots: props.jots
+      jots: props.jots,
+      socket: openSocket("http://localhost:8000")
     }
+    this.state.socket.on('new jot', jotText => {
+      console.log("new jot");
+      this.setState((oldState) => ({
+        jots: oldState.jots.concat([jotText])
+      }))
+    });
   }
 
-  handleCreateJot(jotText) {
-    this.setState((oldState) => ({
-      jots: oldState.jots.concat([jotText])
-    }))
+  handleCreateJot(jotData) {
+    console.log('Emitting new jot')
+    this.state.socket.emit('new jot', jotData);
   }
 
   render() {
