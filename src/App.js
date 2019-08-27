@@ -2,25 +2,58 @@ import React, {Component} from 'react';
 import Draggable from 'react-draggable';
 import './App.css';
 import openSocket from 'socket.io-client'
+import {GithubPicker} from 'react-color'
 
 class JotMaker extends Component {
   constructor(props) {
     super(props);
     this.onFormSubmit = this.onFormSubmit.bind(this);
+    this.handleColorClick = this.handleColorClick.bind(this);
+    this.handleCloseColorPicker = this.handleCloseColorPicker.bind(this);
+    this.handleColorChange = this.handleColorChange.bind(this);
+    this.state = {
+      displayColorPicker: false,
+      color: 'rgb(254, 243, 189)'
+    }
   }
 
   onFormSubmit(e) {
     e.preventDefault();
     const text = e.target.elements.jotText.value.trim();
-    const color = e.target.elements.jotText.value.trim();
-    this.props.handleCreateJot({text, color});
+    const color = this.state.color;
+    const position = {x: 0, y:0}
+    this.props.handleCreateJot({text, color, position});
+  }
+
+  handleColorClick() {
+    this.setState({ displayColorPicker: !this.state.displayColorPicker })
+  }
+
+  handleCloseColorPicker() {
+    this.setState({ displayColorPicker: false })
+  }
+
+  handleColorChange(color) {
+    console.log(color);
+    this.setState({ color: color.hex})
   }
 
   render() {
+    const colors = ['#EB9694', '#FAD0C3', '#FEF3BD', '#C1E1C5', '#BEDADC', '#C4DEF6', '#BED3F3', '#D4C4FB'];
     return (
       <div>
         <form onSubmit={this.onFormSubmit} className="new-form">
           <input className="form-input" type="text" name="jotText" />
+          <div className="swatch" onClick={this.handleColorClick}>
+            <div className="swatch-color" style={{background: this.state.color}}></div>
+          </div>
+          {this.state.displayColorPicker && (
+            <div className="popover">
+              <div className="cover" onClick={this.handleCloseColorPicker}>
+                <GithubPicker colors={colors} onChange={this.handleColorChange}/>
+              </div>
+            </div>
+          )}
           <button className="form-button" type="submit">
             Jot
           </button>
@@ -29,18 +62,56 @@ class JotMaker extends Component {
     );
   }
 }
-const Jot = props => (
-  <Draggable class="jot">
-    <div className="box">
-      <p>{props.text}</p>
-    </div>
-  </Draggable>
-);
+class Jot extends Component {
+  constructor(props) {
+    console.log('Making jot')
+    super(props);
+    this.positionUpdate = this.positionUpdate.bind(this);
+    this.state = {
+      id: props.jotData.id,
+      text: props.jotData.text,
+      color: props.jotData.color,
+      position: props.position,
+      positionUpdate: props.positionUpdate
+    }
+
+    props.socket.on("jot moved", moveData => {
+      console.log("moving jot");
+      if (moveData.id === this.state.id) {
+        console.log('Found jot to move')
+        this.setState({position: moveData.position})
+      }
+    });
+  }
+  positionUpdate(e, position) {
+    //let {x, y}  = position
+    this.state.positionUpdate(e, position);
+    /*
+    this.setState({
+      position: { x, y }
+    });
+    */
+  }
+
+  render() {
+    return (
+      <Draggable onStop={this.positionUpdate} position={this.state.position}>
+        <div
+          id={this.state.id}
+          className="box"
+          style={{ background: this.state.color }}
+        >
+          <p>{this.state.text}</p>
+        </div>
+      </Draggable>
+    );
+  }
+}
 
 const JotContainer = props => (
   <div className="jot-container">
     {props.jots.map((jotData) => (
-      <Jot key={jotData.key} text={jotData.text}/>
+      <Jot key={jotData.id} jotData={jotData} positionUpdate={props.positionUpdate} position={jotData.position} socket={props.socket}/>
     ))}
   </div>
 )
@@ -50,16 +121,18 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.handleCreateJot = this.handleCreateJot.bind(this);
+    this.handleUpdatePosition = this.handleUpdatePosition.bind(this);
     this.state = {
       jots: props.jots,
       socket: openSocket("http://localhost:8000")
     }
-    this.state.socket.on('new jot', jotText => {
+    this.state.socket.on('new jot', jotData => {
       console.log("new jot");
       this.setState((oldState) => ({
-        jots: oldState.jots.concat([jotText])
+        jots: oldState.jots.concat([jotData])
       }))
     });
+
   }
 
   handleCreateJot(jotData) {
@@ -67,11 +140,25 @@ class App extends Component {
     this.state.socket.emit('new jot', jotData);
   }
 
+  handleUpdatePosition(e, position) {
+    const {x, y} = position;
+    let draggableElement = undefined;
+    for (let element of e.path) {
+      if (element.classList.contains('react-draggable')) {
+        draggableElement = element;
+        break;
+      }
+    }
+    if (!draggableElement)
+      return;
+    this.state.socket.emit('jot moved', {id: parseInt(draggableElement.id), position: {x, y}});
+  }
+
   render() {
     return (
       <div className="App">
         <JotMaker handleCreateJot={this.handleCreateJot}/>
-        <JotContainer jots={this.state.jots}/>
+        <JotContainer jots={this.state.jots} positionUpdate={this.handleUpdatePosition} socket={this.state.socket}/>
       </div>
     );
   }
