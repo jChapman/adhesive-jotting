@@ -34,7 +34,6 @@ class JotMaker extends Component {
   }
 
   handleColorChange(color) {
-    console.log(color);
     this.setState({ color: color.hex})
   }
 
@@ -64,7 +63,6 @@ class JotMaker extends Component {
 }
 class Jot extends Component {
   constructor(props) {
-    console.log('Making jot')
     super(props);
     this.positionUpdate = this.positionUpdate.bind(this);
     this.state = {
@@ -72,25 +70,27 @@ class Jot extends Component {
       text: props.jotData.text,
       color: props.jotData.color,
       position: props.position,
-      positionUpdate: props.positionUpdate
+      positionUpdate: props.positionUpdate,
+      socket: props.socket
     }
+    this.handleDelete = this.handleDelete.bind(this);
 
     props.socket.on("jot moved", moveData => {
-      console.log("moving jot");
       if (moveData.id === this.state.id) {
-        console.log('Found jot to move')
         this.setState({position: moveData.position})
       }
     });
   }
   positionUpdate(e, position) {
-    //let {x, y}  = position
     this.state.positionUpdate(e, position);
-    /*
+    let {x, y}  = position
     this.setState({
       position: { x, y }
     });
-    */
+  }
+
+  handleDelete() {
+    this.props.socket.emit('delete jot', {id: this.state.id});
   }
 
   render() {
@@ -101,6 +101,7 @@ class Jot extends Component {
           className="box"
           style={{ background: this.state.color }}
         >
+          <div style={{textAlign: 'right', paddingRight: '5px'}} onClick={this.handleDelete}>X</div>
           <p>{this.state.text}</p>
         </div>
       </Draggable>
@@ -127,16 +128,20 @@ class App extends Component {
       socket: openSocket("http://localhost:8000")
     }
     this.state.socket.on('new jot', jotData => {
-      console.log("new jot");
       this.setState((oldState) => ({
         jots: oldState.jots.concat([jotData])
       }))
     });
-
+    this.state.socket.on('delete jot', jotData => {
+      this.setState((oldState) => ({
+        jots: oldState.jots.filter((jot) => {
+          return jot.id !== jotData.id;
+        })
+      }))
+    });
   }
 
   handleCreateJot(jotData) {
-    console.log('Emitting new jot')
     this.state.socket.emit('new jot', jotData);
   }
 

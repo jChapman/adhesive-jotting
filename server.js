@@ -26,6 +26,10 @@ io.on('connection', (socket) => {
      // Notify clients
      io.emit('jot moved', moveData);
    })
+   socket.on('delete jot', (jotData) => {
+     jots = jots.filter(jot => jot.id === jotData.id)
+     io.emit('delete jot', jotData);
+   });
 
 });
 
