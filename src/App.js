@@ -2,66 +2,44 @@ import React, {Component} from 'react';
 import Draggable from 'react-draggable';
 import './App.css';
 import openSocket from 'socket.io-client'
-import {GithubPicker} from 'react-color'
 
-class JotMaker extends Component {
+import Pad from './Components/Pad'
+import Jot from './Components/Jot'
+
+
+let id = 0;
+class App extends Component {
   constructor(props) {
     super(props);
-    this.onFormSubmit = this.onFormSubmit.bind(this);
-    this.handleColorClick = this.handleColorClick.bind(this);
-    this.handleCloseColorPicker = this.handleCloseColorPicker.bind(this);
-    this.handleColorChange = this.handleColorChange.bind(this);
     this.state = {
-      displayColorPicker: false,
-      color: 'rgb(254, 243, 189)'
+      jots: []
     }
   }
-
-  onFormSubmit(e) {
-    e.preventDefault();
-    const text = e.target.elements.jotText.value.trim();
-    const color = this.state.color;
-    const position = {x: 0, y:0}
-    this.props.handleCreateJot({text, color, position});
-  }
-
-  handleColorClick() {
-    this.setState({ displayColorPicker: !this.state.displayColorPicker })
-  }
-
-  handleCloseColorPicker() {
-    this.setState({ displayColorPicker: false })
-  }
-
-  handleColorChange(color) {
-    this.setState({ color: color.hex})
+  handleCreateJot = (jotData) => {
+    this.setState(oldState => ({
+      jots: oldState.jots.concat([
+        { id: id++, color: jotData.color, text: jotData.text }
+      ])
+    }));
   }
 
   render() {
-    const colors = ['#EB9694', '#FAD0C3', '#FEF3BD', '#C1E1C5', '#BEDADC', '#C4DEF6', '#BED3F3', '#D4C4FB'];
     return (
-      <div>
-        <form onSubmit={this.onFormSubmit} className="new-form">
-          <input className="form-input" type="text" name="jotText" />
-          <div className="swatch" onClick={this.handleColorClick}>
-            <div className="swatch-color" style={{background: this.state.color}}></div>
-          </div>
-          {this.state.displayColorPicker && (
-            <div className="popover">
-              <div className="cover" onClick={this.handleCloseColorPicker}>
-                <GithubPicker colors={colors} onChange={this.handleColorChange}/>
-              </div>
-            </div>
-          )}
-          <button className="form-button" type="submit">
-            Jot
-          </button>
-        </form>
+      <div className="App">
+        <Pad handleCreateJot={this.handleCreateJot} />
+        {this.state.jots.map(jotData => (
+          <Jot
+            key={jotData.id}
+            color={jotData.color}
+            text={jotData.text}
+          />
+        ))}
       </div>
     );
   }
 }
-class Jot extends Component {
+
+class OldJot extends Component {
   constructor(props) {
     super(props);
     this.positionUpdate = this.positionUpdate.bind(this);
@@ -118,7 +96,7 @@ const JotContainer = props => (
 )
 
 
-class App extends Component {
+class OldApp extends Component {
   constructor(props) {
     super(props);
     this.handleCreateJot = this.handleCreateJot.bind(this);
@@ -164,18 +142,20 @@ class App extends Component {
     this.state.socket.emit('delete all');
   }
 
+  /*
   render() {
     return (
       <div className="App">
-        <JotMaker handleCreateJot={this.handleCreateJot}/>
+        //<JotMaker handleCreateJot={this.handleCreateJot}/>
         <button onClick={this.handleDeleteAll}>Delete All</button>
         <JotContainer jots={this.state.jots} positionUpdate={this.handleUpdatePosition} socket={this.state.socket}/>
       </div>
     );
   }
+  */
 }
 
-App.defaultProps = {
+OldApp.defaultProps = {
   jots: []
 }
 
