@@ -13,15 +13,31 @@
     background: #fff;
     border: 1px solid #999;
     border-radius: 3px;
+    padding: 10px;
     width: 180px;
     height: 180px;
     margin: 10px;
-    padding: 10px;
     float: left;
     position: absolute;
 }
+
+.jot-text {
+  text-align: center;
+}
+
+#close-button {
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(0,0,0,.1)
+}
+
 .form-input {
-  background: rgba(255, 255, 255, .25)
+  background: rgba(255, 255, 255, .25);
+  text-align: center;
+  resize: none;
+  height: 140px;
+  width: 100%;
 }
 
 input {
@@ -55,4 +71,11 @@ input {
   width: 36px;
   height: 14px;
   border-radius: 2px;
+}
+
+.colorpicker {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 5px
 }
