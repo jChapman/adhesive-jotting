@@ -1,41 +1,35 @@
 import React, {Component} from 'react';
 import './App.css';
-//import openSocket from 'socket.io-client'
+import openSocket from 'socket.io-client'
 
 import Pad from './Components/Pad'
 import Jot from './Components/Jot'
 
+const SERVER_URL = "http://localhost:8000"
 
-let id = 0;
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      jots: [{id: id++, text: 'blah', color: 'rgb(254, 243, 189)', position: {x: 500, y: 30}}]
+      jots: [],
+      socket: openSocket(SERVER_URL)
     }
-  }
-  handleCreateJot = (jotData) => {
-    this.setState(oldState => ({
-      jots: oldState.jots.concat([
-        { id: id++, color: jotData.color, text: jotData.text }
-      ])
-    }));
-  }
-
-  handleDeleteJot = (jotId) => {
-    this.setState(oldState => ({
-      jots: oldState.jots.filter((jot) => jot.id !== jotId)
-    }))
+    this.state.socket.on('new jot', jotData => {
+      this.setState(({jots}) => ({jots: jots.concat([jotData])}));
+    })
+    this.state.socket.on('delete jot', jotData => {
+      this.setState(({jots}) => ({ jots: jots.filter((jot) => jot.id !== jotData.id)}))
+    })
   }
 
   render() {
     return (
       <div className="App">
-        <Pad handleCreateJot={this.handleCreateJot} />
+        <Pad handleCreateJot={this.handleCreateJot} socket={this.state.socket}/>
         {this.state.jots.map(jotData => (
           <Jot
             key={jotData.id}
-            handleDelete={this.handleDeleteJot}
+            socket={this.state.socket}
             {...jotData}
           />
         ))}

@@ -16,7 +16,7 @@ class Pad extends Component {
     console.log(text);
     e.target.elements.jotText.value = "";
     const color = this.state.color;
-    this.props.handleCreateJot({ text, color });
+    this.props.socket.emit('new jot', { text, color, position: {x: 0, y:0} });
   };
 
   handleColorClick = () => {
