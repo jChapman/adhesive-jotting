@@ -1,10 +1,11 @@
 var app = require('express')();
-var http = require('http').createServer(app)
+//var http = require('http').createServer(app)
 const io = require('socket.io')();
 let id = 0;
 let jots = [];
 
 io.on('connection', (socket) => {
+  console.log(jots)
   jots.forEach((jotData) => {
     socket.emit('new jot', jotData);
   })
@@ -18,7 +19,7 @@ io.on('connection', (socket) => {
    socket.on('jot moved', (moveData) => {
      // Update the jot in our list
      for (let jot of jots) {
-       if (jot.id == moveData.id) { // id is a string on moveData, but an int on our side
+       if (jot.id === moveData.id) { 
          jot.position = moveData.position;
          break;
        }
@@ -27,7 +28,7 @@ io.on('connection', (socket) => {
      io.emit('jot moved', moveData);
    })
    socket.on('delete jot', (jotData) => {
-     jots = jots.filter(jot => jot.id === jotData.id)
+     jots = jots.filter(jot => jot.id !== jotData.id)
      io.emit('delete jot', jotData);
    });
    socket.on("delete all", () => {

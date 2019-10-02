@@ -4,25 +4,31 @@ import Draggable from 'react-draggable';
 class Jot extends Component {
   constructor(props) {
     super(props);
-    console.log("Created Jot");
+    this.state = {
+      position: props.position,
+    }
+    this.props.socket.on('jot moved', jotData => {
+      if (jotData.id === this.props.id) {
+        this.setState(()=> ({position: jotData.position}))
+      }
+    })
+  }
+
+  dragStarted = () => {
+
   }
 
   positionUpdate = (e, position) => {
-    //this.state.positionUpdate(e, position);
-    //let {x, y}  = position
-    this.setState({
-      position
-    });
+    this.props.socket.emit('jot moved', {id: this.props.id, position: {x:position.x, y:position.y}})
   };
 
   handleDelete = () => {
-    //this.props.socket.emit('delete jot', {id: this.state.id});
-    this.props.handleDelete(this.props.id)
+    this.props.socket.emit('delete jot', {id: this.props.id});
   };
 
   render() {
     return (
-      <Draggable onStop={this.positionUpdate} position={this.props.position} cancel="button">
+      <Draggable onStop={this.positionUpdate} position={this.state.position} onStart={this.dragStarted}>
         <div
           id={this.props.id}
           className="box"
