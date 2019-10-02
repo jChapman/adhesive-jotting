@@ -11,7 +11,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      jots: [{id: id++, text: 'blah', color: 'rgb(254, 243, 189)'}]
+      jots: [{id: id++, text: 'blah', color: 'rgb(254, 243, 189)', position: {x: 500, y: 30}}]
     }
   }
   handleCreateJot = (jotData) => {
