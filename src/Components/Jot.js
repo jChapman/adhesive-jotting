@@ -8,13 +8,11 @@ class Jot extends Component {
   }
 
   positionUpdate = (e, position) => {
-    /*
-    this.state.positionUpdate(e, position);
-    let {x, y}  = position
+    //this.state.positionUpdate(e, position);
+    //let {x, y}  = position
     this.setState({
-      position: { x, y }
+      position
     });
-    */
   };
 
   handleDelete = () => {
@@ -24,7 +22,7 @@ class Jot extends Component {
 
   render() {
     return (
-      <Draggable onStop={this.positionUpdate} position={this.props.position}>
+      <Draggable onStop={this.positionUpdate} position={this.props.position} cancel="button">
         <div
           id={this.props.id}
           className="box"
