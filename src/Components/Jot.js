@@ -10,7 +10,7 @@ class Jot extends Component {
     }
     this.props.socket.on('jot moved', jotData => {
       if (jotData.id === this.props.id) {
-        this.setState(()=> ({position: jotData.position}))
+        this.setState(()=> ({position: jotData.position, locked:false}))
       }
     })
     this.props.socket.on('updateVotes', voteData => {
@@ -18,10 +18,18 @@ class Jot extends Component {
         this.setState(()=> ({votes: voteData.votes}))
       }
     })
+    this.props.socket.on('lock jot', ({id}) => {
+      if (this.props.id === id) {
+        this.setState(() => ({locked: true}))
+      }
+    })
   }
 
   dragStarted = () => {
-
+    if (this.state.locked) {
+      return false;
+    }
+    this.props.socket.emit("lock jot", {id: this.props.id})
   }
 
   positionUpdate = (e, position) => {
@@ -51,7 +59,7 @@ class Jot extends Component {
         <div
           id={this.props.id}
           className="box"
-          style={{ background: this.props.color }}
+          style={{ background: this.props.color, boxShadow: this.state.locked ? "0 0 10px 0px #00f3ff" : "none"}}
         >
           <button id="close-button" onClick={this.handleDelete}>
             X
