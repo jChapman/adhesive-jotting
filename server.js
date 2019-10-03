@@ -1,6 +1,6 @@
-var app = require('express')();
-//var http = require('http').createServer(app)
 const io = require('socket.io')();
+const os = require('os')
+
 let id = 0;
 let jots = [];
 let ghostJots = [];
@@ -49,7 +49,24 @@ io.on('connection', (socket) => {
      }
      jots = [];
    });
+   socket.on("updateVotes", (voteData) => {
+     for (let jot of jots) {
+       if (jot.id === voteData.id) { 
+         jot.votes = voteData.votes;
+         break;
+       }
+     }
+     io.emit("updateVotes", voteData)
+   })
 });
+
+let networkInterfaces = os.networkInterfaces();
+console.log('Addresses: ')
+for (const iface in networkInterfaces) {
+  for (const thing of networkInterfaces[iface]) {
+    console.log(thing.address);
+  }
+}
 
 const port = 8000;
 io.listen(port);
