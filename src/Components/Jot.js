@@ -19,7 +19,12 @@ class Jot extends Component {
   }
 
   positionUpdate = (e, position) => {
-    this.props.socket.emit('jot moved', {id: this.props.id, position: {x:position.x, y:position.y}})
+    this.props.socket.emit("jot moved", {
+      position: { x: position.x, y: position.y },
+      id: this.props.id,
+      color: this.props.color,
+      text: this.props.text,
+    });
   };
 
   handleDelete = () => {
