@@ -3,9 +3,11 @@ var app = require('express')();
 const io = require('socket.io')();
 let id = 0;
 let jots = [];
+let ghostJots = [];
 
 io.on('connection', (socket) => {
-  console.log(jots)
+  socket.emit('connected')
+
   jots.forEach((jotData) => {
     socket.emit('new jot', jotData);
   })
@@ -13,10 +15,20 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => { console.log('A user disconnected')})
   socket.on('new jot', (jotData) => { 
     jotData.id = id++;
-    io.emit('new jot', jotData)
-    jots.push(jotData);
+    ghostJots.push(jotData);
+    socket.emit('new jot', jotData)
    })
    socket.on('jot moved', (moveData) => {
+     //console.log('Moving jot #', moveData.id)
+     //console.log('ghostJots', ghostJots)
+     //console.log('jots', jots)
+     let beforeLength = ghostJots.length
+     ghostJots = ghostJots.filter((jot) => jot.id !== moveData.id)
+     if (ghostJots.length !== beforeLength) {
+       io.emit("new jot", moveData);
+       jots.push(moveData);
+     }
+
      // Update the jot in our list
      for (let jot of jots) {
        if (jot.id === moveData.id) { 

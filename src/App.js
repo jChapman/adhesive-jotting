@@ -14,7 +14,13 @@ class App extends Component {
       jots: [],
       socket: openSocket(SERVER_URL)
     }
+    this.state.socket.on('connected', () => {
+      this.setState(() => ({jots: []}));
+    })
     this.state.socket.on('new jot', jotData => {
+      // Ignore new's if we already have that jot
+      if (this.state.jots.filter((jot)=> jot.id === jotData.id).length > 0)
+        return
       this.setState(({jots}) => ({jots: jots.concat([jotData])}));
     })
     this.state.socket.on('delete jot', jotData => {
