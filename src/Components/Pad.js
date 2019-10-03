@@ -6,7 +6,8 @@ class Pad extends Component {
     super(props);
     this.state = {
       displayColorPicker: false,
-      color: "rgb(254, 243, 189)"
+      color: "rgb(254, 243, 189)",
+      adminMode: false
     };
   }
 
@@ -16,6 +17,11 @@ class Pad extends Component {
     console.log(text);
     e.target.elements.jotText.value = "";
     const color = this.state.color;
+    if (text === "sudo") {
+      this.setState(() => ({ adminMode: true }));
+      console.log("Admin mode activated");
+      return;
+    }
     this.props.socket.emit("new jot", {
       text,
       color,
@@ -41,6 +47,20 @@ class Pad extends Component {
   handleColorSelect = color => {
     this.setState({ color: color.hex, displayColorPicker: false });
   };
+
+  turnOffAdmin = () => {
+    this.setState(() => ({ adminMode: false }));
+  };
+
+  clearAll = () => {
+    //if (confirm("Are you sure you want to delete all jots?"))
+      this.props.socket.emit("delete all")
+  };
+
+  listTop = () => {
+    this.props.socket.emit("toggle top")
+  };
+
   render = () => {
     const colors = [
       "#EB9694",
@@ -76,26 +96,26 @@ class Pad extends Component {
           }}
         ></div>
         <div className="box" style={{ background: this.state.color }}>
-        <div className="colorpicker">
-          <img
-            src="colorpal.svg"
-            alt="select color"
-            onClick={this.handleColorClick}
-          />
-          {this.state.displayColorPicker && (
-            <div className="popover">
-              <GithubPicker
-                colors={colors}
-                onChange={this.handleColorSelect}
-                onSwatchHover={this.handleColorChange}
-              />
-              <div
-                className="cover"
-                onClick={this.handleCloseColorPicker}
-                style={{ zIndex: -1 }}
-              ></div>
-            </div>
-          )}
+          <div className="colorpicker">
+            <img
+              src="colorpal.svg"
+              alt="select color"
+              onClick={this.handleColorClick}
+            />
+            {this.state.displayColorPicker && (
+              <div className="popover">
+                <GithubPicker
+                  colors={colors}
+                  onChange={this.handleColorSelect}
+                  onSwatchHover={this.handleColorChange}
+                />
+                <div
+                  className="cover"
+                  onClick={this.handleCloseColorPicker}
+                  style={{ zIndex: -1 }}
+                ></div>
+              </div>
+            )}
           </div>
           <form onSubmit={this.onFormSubmit} className="new-form">
             <input
@@ -106,6 +126,16 @@ class Pad extends Component {
             />
             <button>Create</button>
           </form>
+        </div>
+        <div
+          className="box"
+          style={{ display: this.state.adminMode ? "block" : "none" }}
+        >
+          <button id="close-button" onClick={this.turnOffAdmin}>
+            X
+          </button>
+          <button onClick={this.clearAll}>Clear all</button>
+          <button onClick={this.listTop}>Show/hide top voted</button>
         </div>
       </div>
     );

@@ -26,19 +26,41 @@ class App extends Component {
     this.state.socket.on('delete jot', jotData => {
       this.setState(({jots}) => ({ jots: jots.filter((jot) => jot.id !== jotData.id)}))
     })
+    this.state.socket.on('show top', jotData => {
+      this.setState(() => ({ showTop: true}))
+    })
+    this.state.socket.on('hide top', jotData => {
+      this.setState(() => ({ showTop: false}))
+    })
+  }
+
+  hideTop = () => {
+      this.setState(() => ({ showTop: false }));
   }
 
   render() {
     return (
       <div className="App">
-        <Pad handleCreateJot={this.handleCreateJot} socket={this.state.socket}/>
+        <Pad socket={this.state.socket} />
         {this.state.jots.map(jotData => (
-          <Jot
-            key={jotData.id}
-            socket={this.state.socket}
-            {...jotData}
-          />
+          <Jot key={jotData.id} socket={this.state.socket} {...jotData} />
         ))}
+        <div className="topJots" style={{ display: this.state.showTop ? "block" : "none" }} >
+          <button id="close-button" onClick={this.hideTop}>
+            X
+          </button>
+          <table className="jotsTable">
+            {[...this.state.jots]
+              .sort((a, b) => b.votes - a.votes)
+              .slice(0, 5)
+              .map(jotData => (
+                <tr key={jotData.id}>
+                  <td>{jotData.votes}</td>
+                  <td>{jotData.text}</td>
+                </tr>
+              ))}
+          </table>
+        </div>
       </div>
     );
   }

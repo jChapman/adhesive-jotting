@@ -103,3 +103,16 @@ input {
   display: inline-block;
   margin-right: 2px;
 }
+
+.topJots {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  background: steelblue;
+  font-size: x-large;
+}
+
+.jotsTable {
+  margin-left:auto; 
+  margin-right:auto;
+}

@@ -4,6 +4,7 @@ const os = require('os')
 let id = 0;
 let jots = [];
 let ghostJots = [];
+let showTop = false;
 
 io.on('connection', (socket) => {
   socket.emit('connected')
@@ -11,6 +12,9 @@ io.on('connection', (socket) => {
   jots.forEach((jotData) => {
     socket.emit('new jot', jotData);
   })
+  if (showTop) {
+    socket.emit("show top")
+  }
   console.log('A user connected')
   socket.on('disconnect', () => { console.log('A user disconnected')})
   socket.on('new jot', (jotData) => { 
@@ -48,6 +52,10 @@ io.on('connection', (socket) => {
        io.emit("delete jot", { id: jot.id });
      }
      jots = [];
+     for (let jot of ghostJots) {
+       io.emit("delete jot", { id: jot.id });
+     }
+     ghostJots = [];
    });
    socket.on("updateVotes", (voteData) => {
      for (let jot of jots) {
@@ -60,6 +68,13 @@ io.on('connection', (socket) => {
    })
    socket.on("lock jot", ({id}) => {
      socket.broadcast.emit("lock jot", {id})
+   })
+   socket.on("toggle top", () => {
+     showTop = !showTop
+     if (showTop)
+      io.emit("show top")
+    else
+      io.emit("hide top")
    })
 });
 
