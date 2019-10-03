@@ -58,6 +58,9 @@ io.on('connection', (socket) => {
      }
      io.emit("updateVotes", voteData)
    })
+   socket.on("lock jot", ({id}) => {
+     socket.broadcast.emit("lock jot", {id})
+   })
 });
 
 let networkInterfaces = os.networkInterfaces();
