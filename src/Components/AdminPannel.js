@@ -31,10 +31,10 @@ class AdminPannel extends Component {
         {this.state.show && (
           <div className="admin-menu">
             <button onClick={this.hideAdmin}>Close admin pannel</button>
+            <button onClick={this.props.showList}>Export to list</button>
             <button>Clear all</button>
             <button>Add Label</button>
             <button>Export to svg</button>
-            <button>Export to list</button>
             <button>Show top votes</button>
           </div>
         )}

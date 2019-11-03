@@ -4,6 +4,7 @@ import openSocket from 'socket.io-client'
 
 import Pad from './Components/Pad'
 import Jot from './Components/Jot'
+import JotList from './Components/JotList'
 import AdminPannel from './Components/AdminPannel'
 
 const SERVER_URL = "http://localhost:8000"
@@ -13,7 +14,8 @@ class App extends Component {
     super(props);
     this.state = {
       jots: [],
-      socket: openSocket(SERVER_URL)
+      socket: openSocket(SERVER_URL),
+      showList: false,
     }
     this.state.socket.on('connected', () => {
       this.setState(() => ({jots: []}));
@@ -29,10 +31,23 @@ class App extends Component {
     })
   }
 
+  showList = () => {
+    this.setState({showList: true})
+  }
+
+  hideList = () => {
+    this.setState({showList: false})
+  }
+
   render() {
     return (
       <div className="App">
-        <AdminPannel/>
+        <AdminPannel showList={this.showList} />
+        <JotList
+          show={this.state.showList}
+          jots={this.state.jots}
+          hide={this.hideList}
+        />
         <Pad
           handleCreateJot={this.handleCreateJot}
           socket={this.state.socket}
