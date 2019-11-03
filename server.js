@@ -13,15 +13,14 @@ io.on('connection', (socket) => {
   })
   console.log('A user connected')
   socket.on('disconnect', () => { console.log('A user disconnected')})
+
   socket.on('new jot', (jotData) => { 
     jotData.id = id++;
     ghostJots.push(jotData);
     socket.emit('new jot', jotData)
    })
+
    socket.on('jot moved', (moveData) => {
-     //console.log('Moving jot #', moveData.id)
-     //console.log('ghostJots', ghostJots)
-     //console.log('jots', jots)
      let beforeLength = ghostJots.length
      ghostJots = ghostJots.filter((jot) => jot.id !== moveData.id)
      if (ghostJots.length !== beforeLength) {
@@ -39,16 +38,19 @@ io.on('connection', (socket) => {
      // Notify clients
      io.emit('jot moved', moveData);
    })
+
    socket.on('delete jot', (jotData) => {
      jots = jots.filter(jot => jot.id !== jotData.id)
      io.emit('delete jot', jotData);
    });
+
    socket.on("delete all", () => {
      for (let jot of jots) {
        io.emit("delete jot", { id: jot.id });
      }
      jots = [];
    });
+
    socket.on("updateVotes", (voteData) => {
      for (let jot of jots) {
        if (jot.id === voteData.id) { 
@@ -58,6 +60,7 @@ io.on('connection', (socket) => {
      }
      io.emit("updateVotes", voteData)
    })
+
    socket.on("lock jot", ({id}) => {
      socket.broadcast.emit("lock jot", {id})
    })

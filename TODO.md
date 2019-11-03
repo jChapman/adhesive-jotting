@@ -5,11 +5,12 @@
 - [X] Admin control pannel
 - [X] Export to list
 - [X] Save as image
-- [ ] Fix the admin things (clear all)
+- [X] Add back clear all
+- [ ] Add back show top votes
 - [ ] Labels
 - [ ] Double click jot to edit
-- [ ] Different boards
 - [ ] Double click to create at that location
+- [ ] Different boards
 - [ ] More options for list view (show in table w/ votes etc)
 - [ ] Assign colors per user, use for cursors and background highlighting 
 - [ ] Multi select

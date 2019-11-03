@@ -60,13 +60,17 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <AdminPannel showList={this.showList} saveImage={this.saveImage} />
+        <AdminPannel
+          showList={this.showList}
+          saveImage={this.saveImage}
+          socket={this.state.socket}
+        />
         <JotList
           show={this.state.showList}
           jots={this.state.jots}
           hide={this.hideList}
         />
-        <ScreenShotShower show={this.state.showImage} close={this.hideImage}/>
+        <ScreenShotShower show={this.state.showImage} close={this.hideImage} />
         <div id="jotContents">
           <Pad
             handleCreateJot={this.handleCreateJot}

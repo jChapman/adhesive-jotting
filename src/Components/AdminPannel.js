@@ -4,7 +4,8 @@ class AdminPannel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      show: false
+      show: false,
+      socket: props.socket,
     };
   }
 
@@ -14,6 +15,10 @@ class AdminPannel extends Component {
 
   hideAdmin = () => {
     this.setState({show: false})
+  }
+
+  clearAll = () => {
+    this.props.socket.emit("delete all");
   }
 
   render = () => {
@@ -33,9 +38,7 @@ class AdminPannel extends Component {
             <button onClick={this.hideAdmin}>Close admin pannel</button>
             <button onClick={this.props.showList}>Export to list</button>
             <button onClick={this.props.saveImage}>Save as image</button>
-            <button>Clear all</button>
-            <button>Add Label</button>
-            <button>Show top votes</button>
+            <button onClick={this.clearAll}>Clear all</button>
           </div>
         )}
       </div>
