@@ -97,7 +97,7 @@ class Pad extends Component {
             </div>
           )}
           </div>
-          <form onSubmit={this.onFormSubmit} className="new-form">
+          <form onSubmit={this.onFormSubmit} autocomplete="off" className="new-form">
             <input
               className="form-input"
               type="text"

@@ -103,3 +103,7 @@ input {
   display: inline-block;
   margin-right: 2px;
 }
+
+.vote-up {
+  cursor: pointer;
+}
