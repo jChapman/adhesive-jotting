@@ -4,11 +4,12 @@
 - [X] Input should not remember text previously entered
 - [X] Admin control pannel
 - [X] Export to list
+- [X] Save as image
+- [ ] Fix the admin things (clear all)
 - [ ] Labels
-- [ ] Different boards
-- [ ] Save as svg
-- [ ] Double click to create at that location
 - [ ] Double click jot to edit
+- [ ] Different boards
+- [ ] Double click to create at that location
 - [ ] More options for list view (show in table w/ votes etc)
 - [ ] Assign colors per user, use for cursors and background highlighting 
 - [ ] Multi select

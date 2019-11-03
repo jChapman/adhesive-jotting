@@ -32,9 +32,9 @@ class AdminPannel extends Component {
           <div className="admin-menu">
             <button onClick={this.hideAdmin}>Close admin pannel</button>
             <button onClick={this.props.showList}>Export to list</button>
+            <button onClick={this.props.saveImage}>Save as image</button>
             <button>Clear all</button>
             <button>Add Label</button>
-            <button>Export to svg</button>
             <button>Show top votes</button>
           </div>
         )}
