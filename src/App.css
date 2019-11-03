@@ -107,3 +107,11 @@ input {
 .vote-up {
   cursor: pointer;
 }
+
+.admin-menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}

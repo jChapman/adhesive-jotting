@@ -4,6 +4,7 @@ import openSocket from 'socket.io-client'
 
 import Pad from './Components/Pad'
 import Jot from './Components/Jot'
+import AdminPannel from './Components/AdminPannel'
 
 const SERVER_URL = "http://localhost:8000"
 
@@ -31,13 +32,13 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Pad handleCreateJot={this.handleCreateJot} socket={this.state.socket}/>
+        <AdminPannel/>
+        <Pad
+          handleCreateJot={this.handleCreateJot}
+          socket={this.state.socket}
+        />
         {this.state.jots.map(jotData => (
-          <Jot
-            key={jotData.id}
-            socket={this.state.socket}
-            {...jotData}
-          />
+          <Jot key={jotData.id} socket={this.state.socket} {...jotData} />
         ))}
       </div>
     );
