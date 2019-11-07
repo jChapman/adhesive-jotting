@@ -7,6 +7,7 @@
 - [X] Save as image
 - [X] Add back clear all
 - [ ] Add back show top votes
+- [ ] Be able to toggle voting off and on
 - [ ] Labels
 - [ ] Double click jot to edit
 - [ ] Double click to create at that location

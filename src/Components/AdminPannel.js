@@ -23,7 +23,7 @@ class AdminPannel extends Component {
 
   render = () => {
     return (
-      <div>
+      <>
         {!this.state.show && (
           <img
             src="super.svg"
@@ -41,7 +41,7 @@ class AdminPannel extends Component {
             <button onClick={this.clearAll}>Clear all</button>
           </div>
         )}
-      </div>
+      </>
     );
   };
 }

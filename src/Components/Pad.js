@@ -53,7 +53,7 @@ class Pad extends Component {
       "#D4C4FB"
     ];
     return (
-      <div>
+      <>
         <div
           className="box"
           style={{
@@ -107,7 +107,7 @@ class Pad extends Component {
             <button>Create</button>
           </form>
         </div>
-      </div>
+      </>
     );
   };
 }
