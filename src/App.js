@@ -9,7 +9,7 @@ import JotList from './Components/JotList'
 import AdminPannel from './Components/AdminPannel'
 import ScreenShotShower from './Components/ScreenShotShower'
 
-const SERVER_URL = "http://localhost:8000"
+const SERVER_URL = `ws://${window.location.host.split(':')[0]}:8000`
 
 class App extends Component {
   constructor(props) {
