@@ -13,7 +13,6 @@ class Pad extends Component {
   onFormSubmit = e => {
     e.preventDefault();
     const text = e.target.elements.jotText.value.trim();
-    console.log(text);
     e.target.elements.jotText.value = "";
     const color = this.state.color;
     this.props.socket.emit("new jot", {
@@ -97,7 +96,7 @@ class Pad extends Component {
             </div>
           )}
           </div>
-          <form onSubmit={this.onFormSubmit} autocomplete="off" className="new-form">
+          <form onSubmit={this.onFormSubmit} autoComplete="off" className="new-form">
             <input
               className="form-input"
               type="text"

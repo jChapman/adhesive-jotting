@@ -46,8 +46,6 @@ class App extends Component {
   saveImage = () => {
     this.setState({ showImage: true });
     html2canvas(document.body).then(function(canvas) {
-      console.log('Done canvasing')
-      console.log(canvas)
       let imageHolder = document.querySelector("#imageHolder")
       imageHolder.appendChild(canvas)
     });

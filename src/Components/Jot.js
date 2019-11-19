@@ -64,7 +64,7 @@ class Jot extends Component {
           <button id="close-button" onClick={this.handleDelete}>
             X
           </button>
-          <div class="vote-button-holder">
+          <div className="vote-button-holder">
             <span onClick={this.voteUp} className="vote-up" role="img" aria-label="vote up">
               👍
             </span>
