@@ -1,49 +1,40 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 
-class AdminPannel extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      show: false,
-      socket: props.socket,
-    };
+const AdminPannel = (props) => {
+  const [show, changeShow] = useState(false)
+
+  const showAdmin = () => {
+    changeShow(true)
   }
 
-  showAdmin = () => {
-    this.setState({show: true})
+  const hideAdmin = () => {
+    changeShow(false)
   }
 
-  hideAdmin = () => {
-    this.setState({show: false})
+  const clearAll = () => {
+    props.socket.emit("delete all");
   }
 
-  clearAll = () => {
-    this.props.socket.emit("delete all");
-  }
-
-  render = () => {
-    return (
-      <>
-        {!this.state.show && (
-          <img
-            src="super.svg"
-            width="24px"
-            alt="Ssh, it's a secret"
-            style={{ position: "absolute" }}
-            onClick={this.showAdmin}
-          />
-        )}
-        {this.state.show && (
-          <div className="admin-menu">
-            <button onClick={this.hideAdmin}>Close admin pannel</button>
-            <button onClick={this.props.showList}>Export to list</button>
-            <button onClick={this.props.saveImage}>Save as image</button>
-            <button onClick={this.clearAll}>Clear all</button>
-          </div>
-        )}
-      </>
-    );
-  };
+  return (
+    <>
+      {!show && (
+        <img
+          src="super.svg"
+          width="24px"
+          alt="Ssh, it's a secret"
+          style={{ position: "absolute" }}
+          onClick={showAdmin}
+        />
+      )}
+      {show && (
+        <div className="admin-menu">
+          <button onClick={hideAdmin}>Close admin pannel</button>
+          <button onClick={props.showList}>Export to list</button>
+          <button onClick={props.saveImage}>Save as image</button>
+          <button onClick={clearAll}>Clear all</button>
+        </div>
+      )}
+    </>
+  );
 }
-
 export default AdminPannel;
