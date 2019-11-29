@@ -1,21 +1,26 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 import {GithubPicker} from 'react-color'
 
-class Pad extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      displayColorPicker: false,
-      color: "rgb(254, 243, 189)"
-    };
-  }
+const COLORS = [
+  "#EB9694",
+  "#FAD0C3",
+  "#FEF3BD",
+  "#C1E1C5",
+  "#BEDADC",
+  "#C4DEF6",
+  "#BED3F3",
+  "#D4C4FB"
+];
 
-  onFormSubmit = e => {
+const Pad = props => {
+  const [displayColorPicker, changeDisplayColorPicker] = useState(false)
+  const [color, setColor] = useState("rgb(254, 243, 189)")
+
+  const onFormSubmit = e => {
     e.preventDefault();
     const text = e.target.elements.jotText.value.trim();
     e.target.elements.jotText.value = "";
-    const color = this.state.color;
-    this.props.socket.emit("new jot", {
+    props.socket.emit("new jot", {
       text,
       color,
       position: { x: 0, y: 0 },
@@ -23,92 +28,81 @@ class Pad extends Component {
     });
   };
 
-  handleColorClick = () => {
-    this.setState(oldState => ({
-      displayColorPicker: !oldState.displayColorPicker
-    }));
+  const handleColorClick = () => {
+    changeDisplayColorPicker(oldState => !oldState)
   };
 
-  handleCloseColorPicker = () => {
-    this.setState(() => ({ displayColorPicker: false }));
+  const handleCloseColorPicker = () => {
+    changeDisplayColorPicker(false)
   };
 
-  handleColorChange = color => {
-    this.setState({ color: color.hex });
+  const handleColorChange = color => {
+    setColor(color.hex)
   };
 
-  handleColorSelect = color => {
-    this.setState({ color: color.hex, displayColorPicker: false });
+  const handleColorSelect = color => {
+    setColor(color.hex)
+    changeDisplayColorPicker(false)
   };
-  render = () => {
-    const colors = [
-      "#EB9694",
-      "#FAD0C3",
-      "#FEF3BD",
-      "#C1E1C5",
-      "#BEDADC",
-      "#C4DEF6",
-      "#BED3F3",
-      "#D4C4FB"
-    ];
-    return (
-      <>
-        <div
-          className="box"
-          style={{
-            transform: "translate(9px, 9px)",
-            background: this.state.color
-          }}
-        ></div>
-        <div
-          className="box"
-          style={{
-            transform: "translate(6px, 6px)",
-            background: this.state.color
-          }}
-        ></div>
-        <div
-          className="box"
-          style={{
-            transform: "translate(3px, 3px)",
-            background: this.state.color
-          }}
-        ></div>
-        <div className="box" style={{ background: this.state.color }}>
-        <div className="colorpicker">
-          <img
-            src="colorpal.svg"
-            alt="select color"
-            onClick={this.handleColorClick}
-          />
-          {this.state.displayColorPicker && (
-            <div className="popover">
-              <GithubPicker
-                colors={colors}
-                onChange={this.handleColorSelect}
-                onSwatchHover={this.handleColorChange}
-              />
-              <div
-                className="cover"
-                onClick={this.handleCloseColorPicker}
-                style={{ zIndex: -1 }}
-              ></div>
-            </div>
-          )}
-          </div>
-          <form onSubmit={this.onFormSubmit} autoComplete="off" className="new-form">
-            <input
-              className="form-input"
-              type="text"
-              name="jotText"
-              placeholder="Enter text here"
+
+  // TODO: This is bad
+  return (
+    <>
+      <div
+        className="box"
+        style={{
+          transform: "translate(9px, 9px)",
+          background: color
+        }}
+      ></div>
+      <div
+        className="box"
+        style={{
+          transform: "translate(6px, 6px)",
+          background: color
+        }}
+      ></div>
+      <div
+        className="box"
+        style={{
+          transform: "translate(3px, 3px)",
+          background: color
+        }}
+      ></div>
+      <div className="box" style={{ background: color }}>
+      <div className="colorpicker">
+        <img
+          src="colorpal.svg"
+          alt="select color"
+          onClick={handleColorClick}
+        />
+        {displayColorPicker && (
+          <div className="popover">
+            <GithubPicker
+              colors={COLORS}
+              onChange={handleColorSelect}
+              onSwatchHover={handleColorChange}
             />
-            <button>Create</button>
-          </form>
+            <div
+              className="cover"
+              onClick={handleCloseColorPicker}
+              style={{ zIndex: -1 }}
+            ></div>
+          </div>
+        )}
         </div>
-      </>
-    );
-  };
+        <form onSubmit={onFormSubmit} autoComplete="off" className="new-form">
+          <input
+            className="form-input"
+            type="text"
+            name="jotText"
+            placeholder="Enter text here"
+          />
+          <button>Create</button>
+        </form>
+      </div>
+    </>
+  )
 }
 
 export default Pad;
