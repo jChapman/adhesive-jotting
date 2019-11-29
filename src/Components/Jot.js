@@ -1,84 +1,84 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 import Draggable from 'react-draggable';
 
-class Jot extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      position: props.position,
-      votes: props.votes,
+const Jot = (props) => {
+  const [position, setPosition] = useState(props.position)
+  const [votes, setVotes] = useState(props.votes)
+  const [locked, setLocked] = useState(false)
+
+  const socket = props.socket;
+
+  socket.on('jot moved', jotData => {
+    if (jotData.id === props.id) {
+      setPosition(jotData.posotion)
+      setLocked(false)
     }
-    this.props.socket.on('jot moved', jotData => {
-      if (jotData.id === this.props.id) {
-        this.setState(()=> ({position: jotData.position, locked:false}))
-      }
-    })
-    this.props.socket.on('updateVotes', voteData => {
-      if (voteData.id === this.props.id) {
-        this.setState(()=> ({votes: voteData.votes}))
-      }
-    })
-    this.props.socket.on('lock jot', ({id}) => {
-      if (this.props.id === id) {
-        this.setState(() => ({locked: true}))
-      }
-    })
+  })
+
+  socket.on('updateVotes', voteData => {
+    if (voteData.id === props.id) {
+      setVotes(voteData.votes)
+    }
+  })
+
+  socket.on('lock jot', ({id}) => {
+    if (props.id === id) {
+      setLocked(true)
+    }
+  })
+
+  const dragStarted = () => {
+    if (!locked) {
+      socket.emit("lock jot", {id: props.id})
+    }
   }
 
-  dragStarted = () => {
-    if (this.state.locked) {
-      return false;
-    }
-    this.props.socket.emit("lock jot", {id: this.props.id})
-  }
-
-  positionUpdate = (e, position) => {
-    this.props.socket.emit("jot moved", {
+  const positionUpdate = (e, position) => {
+    socket.emit("jot moved", {
       position: { x: position.x, y: position.y },
-      id: this.props.id,
-      color: this.props.color,
-      text: this.props.text,
-      votes: this.props.votes
+      id: props.id,
+      color: props.color,
+      text: props.text,
+      votes: votes
     });
   };
 
-  handleDelete = () => {
-    this.props.socket.emit('delete jot', {id: this.props.id});
-  };
-  voteUp = () => {
-    this.props.socket.emit('updateVotes', {id: this.props.id, votes: this.state.votes+1});
+  const handleDelete = () => {
+    socket.emit('delete jot', {id: props.id});
   };
 
-  render() {
-    return (
-      <Draggable
-        onStop={this.positionUpdate}
-        position={this.state.position}
-        onStart={this.dragStarted}
+  const voteUp = () => {
+    socket.emit('updateVotes', {id: props.id, votes: votes+1});
+  };
+
+  return (
+    <Draggable
+      onStop={positionUpdate}
+      position={position}
+      onStart={dragStarted}
+    >
+      <div
+        id={props.id}
+        className="box"
+        style={{ background: props.color, boxShadow: locked ? "0 0 10px 0px #00f3ff" : "none"}}
       >
-        <div
-          id={this.props.id}
-          className="box"
-          style={{ background: this.props.color, boxShadow: this.state.locked ? "0 0 10px 0px #00f3ff" : "none"}}
-        >
-          <button id="close-button" onClick={this.handleDelete}>
-            X
-          </button>
-          <div className="vote-button-holder">
-            <span onClick={this.voteUp} className="vote-up" role="img" aria-label="vote up">
-              👍
-            </span>
-          </div>
-          <p className="jot-text">{this.props.text}</p>
-          <div className="vote-holder">
-            {[...Array(this.state.votes)].map((e, i) => (
-              <span className="vote" key={i}></span>
-            ))}
-          </div>
+        <button id="close-button" onClick={handleDelete}>
+          X
+        </button>
+        <div className="vote-button-holder">
+          <span onClick={voteUp} className="vote-up" role="img" aria-label="vote up">
+            👍
+          </span>
         </div>
-      </Draggable>
-    );
-  }
+        <p className="jot-text">{props.text}</p>
+        <div className="vote-holder">
+          {[...Array(votes)].map((e, i) => (
+            <span className="vote" key={i}></span>
+          ))}
+        </div>
+      </div>
+    </Draggable>
+  );
 }
 
 export default Jot;
