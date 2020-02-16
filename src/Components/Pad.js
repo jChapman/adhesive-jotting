@@ -1,20 +1,26 @@
 import React, {useState} from 'react';
 import {GithubPicker} from 'react-color'
 
+import colorpal from '../img/colorpal.svg'
+
 const COLORS = [
   "#EB9694",
   "#FAD0C3",
   "#FEF3BD",
+  '#4CAF50',
+  '#C8E6C9',
   "#C1E1C5",
   "#BEDADC",
   "#C4DEF6",
   "#BED3F3",
-  "#D4C4FB"
+  "#D4C4FB",
+
 ];
 
 const Pad = props => {
   const [displayColorPicker, changeDisplayColorPicker] = useState(false)
   const [color, setColor] = useState("rgb(254, 243, 189)")
+  const roomId = props.roomId
 
   const onFormSubmit = e => {
     e.preventDefault();
@@ -24,7 +30,8 @@ const Pad = props => {
       text,
       color,
       position: { x: 0, y: 0 },
-      votes: 0
+      votes: 0,
+      roomId
     });
   };
 
@@ -72,7 +79,7 @@ const Pad = props => {
       <div className="box" style={{ background: color }}>
       <div className="colorpicker">
         <img
-          src="colorpal.svg"
+          src={colorpal}
           alt="select color"
           onClick={handleColorClick}
         />

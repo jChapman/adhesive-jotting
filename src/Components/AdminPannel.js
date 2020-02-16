@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 
+import superImg from '../img/super.svg'
+
 const AdminPannel = (props) => {
   const [show, changeShow] = useState(false)
 
@@ -19,7 +21,7 @@ const AdminPannel = (props) => {
     <>
       {!show && (
         <img
-          src="super.svg"
+          src={superImg}
           width="24px"
           alt="Ssh, it's a secret"
           style={{ position: "absolute" }}

@@ -7,8 +7,10 @@ const Jot = (props) => {
   const [locked, setLocked] = useState(false)
 
   const socket = props.socket;
+  const roomId = props.roomId;
 
   socket.on('jot moved', jotData => {
+    console.log('got jot moved')
     if (jotData.id === props.id) {
       setPosition(jotData.posotion)
       setLocked(false)
@@ -39,7 +41,8 @@ const Jot = (props) => {
       id: props.id,
       color: props.color,
       text: props.text,
-      votes: votes
+      votes: votes,
+      roomId
     });
   };
 

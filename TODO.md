@@ -13,7 +13,7 @@
 - [ ] Double click to create at that location
 - [ ] Different boards
 - [ ] More options for list view (show in table w/ votes etc)
-- [ ] Assign colors per user, use for cursors and background highlighting 
+- [ ] Assign colors per user, use for cursors and background highlighting
 - [ ] Multi select
 - [ ] Make cursors visible
 - [ ] Bring to front/back
