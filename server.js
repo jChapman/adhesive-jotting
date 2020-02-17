@@ -8,12 +8,11 @@ let rooms = []
 let id = 0
 
 function getRoomById(lookupId) {
-  console.log(`getRoomsById lookupId ${typeof(lookupId)}`)
   let maybeFound = rooms.filter(({id}) => lookupId.toString() === id.toString())
   if (maybeFound.length === 1) {
-    console.log('Found rooM')
     return maybeFound[0]
   }
+  console.log(`Didn't find ${lookupId}, current rooms: ${rooms.map(room => room.id)}`)
   return {jots: []}
 }
 
@@ -21,55 +20,95 @@ function getJotsById(id) {
   return getRoomById(id).jots
 }
 
+// Returns true if we removed a jot
+function removeGhostJot(roomId, jotId) {
+  const room = getRoomById(roomId)
+  let removed = false
+  room.ghostJots = room.ghostJots.filter(jot => {
+    if (jot.id === jotId){
+      room.jots.push(jot)
+      removed = true
+      return false
+    }
+    return true
+  })
+  //if (removed) console.log(`Removed ghost jot ${jotId}`)
+  return removed
+}
+
+
 function onConnect(socket) {
   // Give the room list 
   socket.emit('room list', rooms)
   socket.on('create room', roomName => {
     if (rooms.filter(({name}) => name === roomName).length === 0) {
-      rooms.push({name: roomName, id: id++, jots:[]})
-      io.emit('room_list', rooms)
+      rooms.push({name: roomName, id: id++, jotIdCount: 0, jots:[], ghostJots:[]})
+      console.log(`Creating room ${roomName}`)
+      io.emit('room list', rooms)
     }
   })
 
   socket.on('connect to', (id) => {
-    Object.keys(socket.rooms).forEach(roomId => {
-      console.log(`Disconnecting from ${roomId}`)
-      if (!isNaN(roomId)) socket.leave(roomId);
-    });
+    for (let room of Object.keys(socket.rooms)) {
+      socket.leave(room)
+    }
     socket.join(id)
-    console.log(`Joining ${id}`)
-    getJotsById(id).forEach(jotData => socket.emit('new jot', jotData))
+    getJotsById(id).forEach(jotData => socket.emit('create jot', jotData))
   })
 
   socket.on('new jot', (jotData) => { 
-    jotData.id = id++;
-    //ghostJots.push(jotData);
-    getRoomById(jotData.roomId).jots.push(jotData)
-    console.log(`Jot created, all rooms: ${rooms}`)
-    console.log(rooms)
-    socket.emit('new jot', jotData)
+    const room = getRoomById(jotData.roomId)
+    jotData.id = room.jotIdCount++
+    room.ghostJots.push(jotData)
+    socket.emit('create jot', jotData)
    })
 
    socket.on('jot moved', (moveData) => {
-     /*
-     let beforeLength = ghostJots.length
-     ghostJots = ghostJots.filter((jot) => jot.id !== moveData.id)
-     if (ghostJots.length !== beforeLength) {
-       io.emit("new jot", moveData);
-       jots.push(moveData);
+     if (removeGhostJot(moveData.roomId, moveData.id)) {
+       io.to(`${moveData.roomId}`).emit('create jot', moveData)
+       getRoomById(moveData.roomId).jots.push(moveData)
      }
 
      // Update the jot in our list
-     for (let jot of jots) {
+     for (let jot of getRoomById(moveData.roomId).jots) {
        if (jot.id === moveData.id) { 
          jot.position = moveData.position;
          break;
        }
      }
-     */
+
      // Notify clients
-     console.log(moveData)
      io.to(`${moveData.roomId}`).emit('jot moved', moveData);
+   })
+
+   socket.on('delete jot', (jotData) => {
+     const room = getRoomById(jotData.roomId)
+     room.jots = room.jots.filter(jot => jot.id !== jotData.id)
+     io.to(`${jotData.roomId}`).emit('delete jot', jotData);
+   });
+
+   socket.on("delete all", () => {
+     const roomId = Object.keys(socket.rooms)[0]
+     const room = getRoomById(roomId)
+     for (let jot of room.jots) {
+        io.to(`${roomId}`).emit("delete jot", { id: jot.id });
+     }
+     room.jots = [];
+   });
+
+   socket.on("updateVotes", (voteData) => {
+     const room = getRoomById(voteData.roomId)
+     for (let jot of room.jots) {
+       if (jot.id === voteData.id) { 
+         jot.votes = voteData.votes;
+         break;
+       }
+     }
+     io.to(`${voteData.roomId}`).emit("updateVotes", voteData)
+   })
+
+   socket.on("lock jot", ({id, roomId}) => {
+     io.to(`${roomId}`).emit("lock jot", {id})
    })
 }
 

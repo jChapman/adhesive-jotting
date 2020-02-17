@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,  useEffect } from "react";
 import { useParams } from "react-router-dom";
 import html2canvas from "html2canvas";
 
@@ -9,18 +9,25 @@ import AdminPannel from "./AdminPannel";
 import ScreenShotShower from "./ScreenShotShower";
 
 const Room = props => {
-  const [jots, setJots] = useState([]);
-  const [listVisible, setListVisible] = useState(false);
-  const [imageVisible, setImageVisible] = useState(false);
-  const roomId = useParams().id;
+  const [jots, setJots] = useState([])
+  const [listVisible, setListVisible] = useState(false)
+  const [imageVisible, setImageVisible] = useState(false)
+  const [roomId] = useState(useParams().id)
   const socket = props.socket;
 
-  socket.on("connected", () => {
-    setJots([]);
-    socket.emit("connect to", roomId);
-  });
+  useEffect(()=> {
+    if (props.socket.connected) {
+      props.socket.emit('connect to', roomId)
+    } else {
+      props.socket.on("connected", () => {
+        setJots([]);
+        props.socket.emit("connect to", roomId);
+      })
+    }
+  }, [props.socket, roomId])
 
-  socket.on("new jot", jotData => {
+
+  socket.on("create jot", jotData => {
     // Ignore new's if we already have that jot
     if (jots.filter(jot => jot.id === jotData.id).length > 0) return;
     setJots([...jots, jotData]);

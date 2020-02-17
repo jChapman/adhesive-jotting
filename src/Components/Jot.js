@@ -10,9 +10,9 @@ const Jot = (props) => {
   const roomId = props.roomId;
 
   socket.on('jot moved', jotData => {
-    console.log('got jot moved')
+    console.log(`Jot moved ${jotData}`)
     if (jotData.id === props.id) {
-      setPosition(jotData.posotion)
+      setPosition(jotData.position)
       setLocked(false)
     }
   })
@@ -31,7 +31,7 @@ const Jot = (props) => {
 
   const dragStarted = () => {
     if (!locked) {
-      socket.emit("lock jot", {id: props.id})
+      socket.emit("lock jot", {id: props.id, roomId})
     }
   }
 
@@ -41,17 +41,17 @@ const Jot = (props) => {
       id: props.id,
       color: props.color,
       text: props.text,
-      votes: votes,
+      votes,
       roomId
     });
   };
 
   const handleDelete = () => {
-    socket.emit('delete jot', {id: props.id});
+    socket.emit('delete jot', {id: props.id, roomId});
   };
 
   const voteUp = () => {
-    socket.emit('updateVotes', {id: props.id, votes: votes+1});
+    socket.emit('updateVotes', {id: props.id, votes: votes+1, roomId});
   };
 
   return (
